@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create Account</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#f3f4f6; display:flex; justify-content:center; padding:40px 16px; }
+    .card { background:#fff; padding:28px; border-radius:12px; width:100%; max-width:380px; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+    h2 { margin-top:0; }
+    label { display:block; margin:12px 0 4px; font-size:14px; }
+    input { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; }
+    button { margin-top:18px; width:100%; padding:11px; background:#2563eb; color:#fff; border:0; border-radius:8px; font-size:15px; cursor:pointer; }
+    #msg { margin-top:14px; font-size:14px; }
+    .ok { color:#15803d; } .err { color:#b91c1c; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Create Account</h2>
+    <form id="form">
+      <label>Full name</label><input name="fullName" required>
+      <label>Email</label><input name="email" type="email" required>
+      <label>Phone (optional)</label><input name="phone" type="tel">
+      <label>Password (min 8 chars)</label><input name="password" type="password" minlength="8" required>
+      <button type="submit">Sign up</button>
+    </form>
+    <div id="msg"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('form');
+    const msg = document.getElementById('msg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const json = await res.json();
+        msg.textContent = json.message || json.error;
+        msg.className = res.ok ? 'ok' : 'err';
+        if (res.ok) form.reset();
+      } catch {
+        msg.textContent = 'Could not reach the server.';
+        msg.className = 'err';
+      }
+    });
+  </script>
+</body>
+</html>
